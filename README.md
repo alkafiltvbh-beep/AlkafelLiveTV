@@ -18,7 +18,7 @@ jobs:
         run: |
           unzip -o AlkafelLiveTV_Project.zip -d project
           ls -la project
-          ls -la project/AlkafelLiveTV
+          ls -la project/AbbassiaLiveTV
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -32,11 +32,11 @@ jobs:
           gradle-version: '8.9'
 
       - name: Build APK
-        working-directory: project/AlkafelLiveTV
+        working-directory: project/AbbassiaLiveTV
         run: gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Alkafel-Live-TV-APK
-          path: project/AlkafelLiveTV/app/build/outputs/apk/debug/app-debug.apk
+          path: project/AbbassiaLiveTV/app/build/outputs/apk/debug/app-debug.apk
