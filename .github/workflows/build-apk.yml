@@ -1,4 +1,4 @@
-name: Build Android APK
+ name: Build Android APK
 
 on:
   workflow_dispatch:
@@ -14,11 +14,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Unzip Android project
+      - name: Unzip base Android project
         run: |
           unzip -o AlkafelLiveTV_WhatsApp_Box.zip -d project
           ls -la project
           ls -la project/AlkafelLiveTV
+
+      - name: Prepare audio folder
+        run: |
+          mkdir -p project/AlkafelLiveTV/app/src/main/res/raw
+
+      - name: Copy audio files
+        run: |
+          cp dua_faraj.mp3 project/AlkafelLiveTV/app/src/main/res/raw/
+          cp dua_sabah.mp3 project/AlkafelLiveTV/app/src/main/res/raw/
+          cp dua_tawassul.mp3 project/AlkafelLiveTV/app/src/main/res/raw/
+          cp ziyarat_amin_allah.mp3 project/AlkafelLiveTV/app/src/main/res/raw/
+          cp ziyarat_ashura.mp3 project/AlkafelLiveTV/app/src/main/res/raw/
+          cp ziyarat_warith.mp3 project/AlkafelLiveTV/app/src/main/res/raw/
+
+      - name: Apply audio page patch
+        run: |
+          unzip -o AlkafelLiveTV_AudioPatch.zip -d audio_patch
+          cp audio_patch/ZiyaratActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ZiyaratActivity.java
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -38,5 +57,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alkafel-Live-TV-WhatsApp-Box-APK
+          name: Alkafel-Live-TV-Audio-APK
           path: project/AlkafelLiveTV/app/build/outputs/apk/debug/app-debug.apk
