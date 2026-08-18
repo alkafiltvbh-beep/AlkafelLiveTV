@@ -16,7 +16,7 @@ jobs:
 
       - name: Unzip Android project
         run: |
-          unzip -o AlkafelLiveTV_FinalUI.zip -d project
+          unzip -o AlkafelLiveTV_Sections.zip -d project
           ls -la project
           ls -la project/AlkafelLiveTV
 
@@ -38,5 +38,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alkafel-Live-TV-Final-APK
+          name: Alkafel-Live-TV-Sections-APK
           path: project/AlkafelLiveTV/app/build/outputs/apk/debug/app-debug.apk
