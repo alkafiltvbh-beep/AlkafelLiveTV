@@ -16,7 +16,7 @@ jobs:
 
       - name: Unzip base Android project
         run: |
-          unzip -o AlkafelLiveTV_WhatsApp_Box.zip -d project
+          unzip -o AlkafelLiveTV_WhatsApp_Direct\(1\).zip -d project
           ls -la project
           ls -la project/AlkafelLiveTV
 
@@ -39,12 +39,22 @@ jobs:
           cp audio_patch/ZiyaratActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ZiyaratActivity.java
 
-      - name: Apply posters patch
+      - name: Apply posters images
         run: |
           unzip -o AlkafelLiveTV_PostersPatch.zip -d posters_patch
           mkdir -p project/AlkafelLiveTV/app/src/main/res/drawable-nodpi
           cp posters_patch/drawable-nodpi/* \
             project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/
+
+      - name: Apply posters page
+        run: |
+          unzip -o AlkafelLiveTV_PostersPagePatch.zip -d posters_page_patch
+          cp posters_page_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
+          cp posters_page_patch/app/src/main/java/tv/alkafel/live/PosterActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
+          cp posters_page_patch/app/src/main/AndroidManifest.xml \
+            project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -64,5 +74,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alkafel-Live-TV-Posters-APK
+          name: Alkafel-Live-TV-Posters-Page-APK
           path: project/AlkafelLiveTV/app/build/outputs/apk/debug/app-debug.apk
