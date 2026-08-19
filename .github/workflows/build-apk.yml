@@ -65,15 +65,8 @@ jobs:
           cp posters123/app/src/main/java/tv/alkafel/live/PosterActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
 
-      - name: Remove WhatsApp numbers
-        run: |
-          unzip -o AlkafelLiveTV_RemoveWhatsAppNumbers_Patch.zip -d whatsapp_remove
-
-          cp whatsapp_remove/app/src/main/java/tv/alkafel/live/MainActivity.java \
-            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
-
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
