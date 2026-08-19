@@ -16,8 +16,8 @@ jobs:
 
       - name: Unzip base Android project
         run: |
-          unzip -o AlkafelLiveTV_WhatsApp_Direct\(1\).zip -d project
-          ls -la project
+          unzip -o AlkafelLiveTV_WhatsApp_Direct.zip -d project
+          test -d project/AlkafelLiveTV
           ls -la project/AlkafelLiveTV
 
       - name: Prepare audio folder
@@ -56,6 +56,13 @@ jobs:
           cp posters_page_patch/app/src/main/AndroidManifest.xml \
             project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
 
+      - name: Verify poster files
+        run: |
+          test -f project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/poster_app_1.jpg
+          test -f project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/poster_youtube.jpg
+          test -f project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/poster_app_2.jpg
+          test -f project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -69,7 +76,7 @@ jobs:
 
       - name: Build APK
         working-directory: project/AlkafelLiveTV
-        run: gradle assembleDebug
+        run: gradle assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
