@@ -18,7 +18,6 @@ jobs:
         run: |
           unzip -o AlkafelLiveTV_WhatsApp_Direct.zip -d project
           test -d project/AlkafelLiveTV
-          ls -la project/AlkafelLiveTV
 
       - name: Prepare audio folder
         run: |
@@ -49,20 +48,29 @@ jobs:
       - name: Apply posters inside app
         run: |
           unzip -o AlkafelLiveTV_Posters_InsideApp_Patch.zip -d posters_page_patch
+
           cp posters_page_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
+
           cp posters_page_patch/app/src/main/java/tv/alkafel/live/PosterActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
+
           cp posters_page_patch/app/src/main/AndroidManifest.xml \
             project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
 
       - name: Apply media squares
         run: |
           unzip -o AlkafelLiveTV_MediaSquares_Patch.zip -d media_squares_patch
+
           cp media_squares_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
-          cp media_squares_patch/app/src/main/java/tv/alkafel/live/MediaActivity.java \
-            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MediaActivity.java
+
+          cp media_squares_patch/app/src/main/java/tv/alkafel/live/PosterActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
+
+          cp media_squares_patch/app/src/main/java/tv/alkafel/live/ProgramsActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ProgramsActivity.java
+
           cp media_squares_patch/app/src/main/AndroidManifest.xml \
             project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
 
