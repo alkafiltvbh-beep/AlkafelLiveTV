@@ -58,6 +58,13 @@ jobs:
           cp media_patch/app/src/main/AndroidManifest.xml \
             project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
 
+      - name: Apply frequency patch
+        run: |
+          unzip -o AlkafelLiveTV_MediaSquares_Frequencies_Patch.zip -d frequency_patch
+
+          cp frequency_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
+
       - name: Apply posters 1 2 3
         run: |
           unzip -o AlkafelLiveTV_Posters_123_Thumbnails_Patch.zip -d posters123
