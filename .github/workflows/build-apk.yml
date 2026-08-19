@@ -56,6 +56,16 @@ jobs:
           cp posters_page_patch/app/src/main/AndroidManifest.xml \
             project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
 
+      - name: Apply media squares
+        run: |
+          unzip -o AlkafelLiveTV_MediaSquares_Patch.zip -d media_squares_patch
+          cp media_squares_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
+          cp media_squares_patch/app/src/main/java/tv/alkafel/live/MediaActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MediaActivity.java
+          cp media_squares_patch/app/src/main/AndroidManifest.xml \
+            project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -74,5 +84,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alkafel-Live-TV-Posters-Inside-App-APK
+          name: Alkafel-Live-TV-Media-Squares-APK
           path: project/AlkafelLiveTV/app/build/outputs/apk/debug/app-debug.apk
