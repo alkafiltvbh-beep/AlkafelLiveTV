@@ -35,13 +35,15 @@ jobs:
       - name: Apply audio page patch
         run: |
           unzip -o AlkafelLiveTV_AudioPatch.zip -d audio_patch
-          cp audio_patch/ZiyaratActivity.java project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ZiyaratActivity.java
+          cp audio_patch/ZiyaratActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ZiyaratActivity.java
 
       - name: Apply poster images
         run: |
           unzip -o AlkafelLiveTV_PostersPatch.zip -d posters_patch
           mkdir -p project/AlkafelLiveTV/app/src/main/res/drawable-nodpi
-          cp posters_patch/drawable-nodpi/* project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/
+          cp posters_patch/drawable-nodpi/* \
+            project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/
 
       - name: Apply media squares
         run: |
