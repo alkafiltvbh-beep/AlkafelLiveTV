@@ -39,6 +39,13 @@ jobs:
           cp audio_patch/ZiyaratActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ZiyaratActivity.java
 
+      - name: Apply posters patch
+        run: |
+          unzip -o AlkafelLiveTV_PostersPatch.zip -d posters_patch
+          mkdir -p project/AlkafelLiveTV/app/src/main/res/drawable-nodpi
+          cp posters_patch/drawable-nodpi/* \
+            project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -57,5 +64,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alkafel-Live-TV-Audio-APK
+          name: Alkafel-Live-TV-Posters-APK
           path: project/AlkafelLiveTV/app/build/outputs/apk/debug/app-debug.apk
