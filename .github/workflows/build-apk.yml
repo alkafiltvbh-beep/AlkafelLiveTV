@@ -65,11 +65,11 @@ jobs:
           cp posters123/app/src/main/java/tv/alkafel/live/PosterActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
 
-      - name: Apply WhatsApp phone box
+      - name: Remove WhatsApp numbers
         run: |
-          unzip -o AlkafelLiveTV_WhatsApp_PhoneBox_Patch.zip -d whatsapp_phone_patch
+          unzip -o AlkafelLiveTV_RemoveWhatsAppNumbers_Patch.zip -d whatsapp_remove
 
-          cp whatsapp_phone_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
+          cp whatsapp_remove/app/src/main/java/tv/alkafel/live/MainActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
 
       - name: Setup Java
