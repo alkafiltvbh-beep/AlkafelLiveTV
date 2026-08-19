@@ -38,41 +38,32 @@ jobs:
           cp audio_patch/ZiyaratActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ZiyaratActivity.java
 
-      - name: Apply posters images
+      - name: Apply poster images
         run: |
           unzip -o AlkafelLiveTV_PostersPatch.zip -d posters_patch
           mkdir -p project/AlkafelLiveTV/app/src/main/res/drawable-nodpi
           cp posters_patch/drawable-nodpi/* \
             project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/
 
-      - name: Apply posters inside app
-        run: |
-          unzip -o AlkafelLiveTV_Posters_InsideApp_Patch.zip -d posters_page_patch
-
-          cp posters_page_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
-            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
-
-          cp posters_page_patch/app/src/main/java/tv/alkafel/live/PosterActivity.java \
-            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
-
-          cp posters_page_patch/app/src/main/AndroidManifest.xml \
-            project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
-
       - name: Apply media squares
         run: |
-          unzip -o AlkafelLiveTV_MediaSquares_Patch.zip -d media_squares_patch
+          unzip -o AlkafelLiveTV_MediaSquares_Patch.zip -d media_patch
 
-          cp media_squares_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
+          cp media_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
 
-          cp media_squares_patch/app/src/main/java/tv/alkafel/live/PosterActivity.java \
-            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
-
-          cp media_squares_patch/app/src/main/java/tv/alkafel/live/ProgramsActivity.java \
+          cp media_patch/app/src/main/java/tv/alkafel/live/ProgramsActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ProgramsActivity.java
 
-          cp media_squares_patch/app/src/main/AndroidManifest.xml \
+          cp media_patch/app/src/main/AndroidManifest.xml \
             project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
+
+      - name: Apply posters 1 2 3 page
+        run: |
+          unzip -o AlkafelLiveTV_Posters_123_Thumbnails_Patch.zip -d posters123
+
+          cp posters123/app/src/main/java/tv/alkafel/live/PosterActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -92,5 +83,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alkafel-Live-TV-Media-Squares-APK
+          name: Alkafel-Live-TV-Final-APK
           path: project/AlkafelLiveTV/app/build/outputs/apk/debug/app-debug.apk
