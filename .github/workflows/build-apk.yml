@@ -65,6 +65,13 @@ jobs:
           cp posters123/app/src/main/java/tv/alkafel/live/PosterActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
 
+      - name: Apply WhatsApp phone box
+        run: |
+          unzip -o AlkafelLiveTV_WhatsApp_PhoneBox_Patch.zip -d whatsapp_phone_patch
+
+          cp whatsapp_phone_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
+            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
