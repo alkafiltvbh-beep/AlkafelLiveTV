@@ -35,42 +35,30 @@ jobs:
       - name: Apply audio page patch
         run: |
           unzip -o AlkafelLiveTV_AudioPatch.zip -d audio_patch
-          cp audio_patch/ZiyaratActivity.java \
-            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ZiyaratActivity.java
+          cp audio_patch/ZiyaratActivity.java project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ZiyaratActivity.java
 
       - name: Apply poster images
         run: |
           unzip -o AlkafelLiveTV_PostersPatch.zip -d posters_patch
           mkdir -p project/AlkafelLiveTV/app/src/main/res/drawable-nodpi
-          cp posters_patch/drawable-nodpi/* \
-            project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/
+          cp posters_patch/drawable-nodpi/* project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/
 
       - name: Apply media squares
         run: |
           unzip -o AlkafelLiveTV_MediaSquares_Patch.zip -d media_patch
-
-          cp media_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
-            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
-
-          cp media_patch/app/src/main/java/tv/alkafel/live/ProgramsActivity.java \
-            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ProgramsActivity.java
-
-          cp media_patch/app/src/main/AndroidManifest.xml \
-            project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
+          cp media_patch/app/src/main/java/tv/alkafel/live/MainActivity.java project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
+          cp media_patch/app/src/main/java/tv/alkafel/live/ProgramsActivity.java project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/ProgramsActivity.java
+          cp media_patch/app/src/main/AndroidManifest.xml project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
 
       - name: Apply frequency patch
         run: |
           unzip -o AlkafelLiveTV_MediaSquares_Frequencies_Patch.zip -d frequency_patch
-
-          cp frequency_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
-            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
+          cp frequency_patch/app/src/main/java/tv/alkafel/live/MainActivity.java project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
 
       - name: Apply posters 1 2 3
         run: |
           unzip -o AlkafelLiveTV_Posters_123_Thumbnails_Patch.zip -d posters123
-
-          cp posters123/app/src/main/java/tv/alkafel/live/PosterActivity.java \
-            project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
+          cp posters123/app/src/main/java/tv/alkafel/live/PosterActivity.java project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
 
       - name: Setup Java
         uses: actions/setup-java@v5
