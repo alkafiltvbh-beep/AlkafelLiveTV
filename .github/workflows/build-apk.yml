@@ -18,7 +18,6 @@ jobs:
         run: |
           unzip -o AlkafelLiveTV_WhatsApp_Direct.zip -d project
           test -d project/AlkafelLiveTV
-          ls -la project/AlkafelLiveTV
 
       - name: Prepare audio folder
         run: |
@@ -46,22 +45,15 @@ jobs:
           cp posters_patch/drawable-nodpi/* \
             project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/
 
-      - name: Apply posters page
+      - name: Apply posters page v2
         run: |
-          unzip -o AlkafelLiveTV_PostersPagePatch.zip -d posters_page_patch
+          unzip -o AlkafelLiveTV_PostersPagePatch_v2.zip -d posters_page_patch
           cp posters_page_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
           cp posters_page_patch/app/src/main/java/tv/alkafel/live/PosterActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
           cp posters_page_patch/app/src/main/AndroidManifest.xml \
             project/AlkafelLiveTV/app/src/main/AndroidManifest.xml
-
-      - name: Verify poster files
-        run: |
-          test -f project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/poster_app_1.jpg
-          test -f project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/poster_youtube.jpg
-          test -f project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/poster_app_2.jpg
-          test -f project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -76,10 +68,10 @@ jobs:
 
       - name: Build APK
         working-directory: project/AlkafelLiveTV
-        run: gradle assembleDebug --stacktrace
+        run: gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alkafel-Live-TV-Posters-Page-APK
+          name: Alkafel-Live-TV-Posters-v2-APK
           path: project/AlkafelLiveTV/app/build/outputs/apk/debug/app-debug.apk
