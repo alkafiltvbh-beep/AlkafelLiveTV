@@ -18,6 +18,7 @@ jobs:
         run: |
           unzip -o AlkafelLiveTV_WhatsApp_Direct.zip -d project
           test -d project/AlkafelLiveTV
+          ls -la project/AlkafelLiveTV
 
       - name: Prepare audio folder
         run: |
@@ -45,9 +46,9 @@ jobs:
           cp posters_patch/drawable-nodpi/* \
             project/AlkafelLiveTV/app/src/main/res/drawable-nodpi/
 
-      - name: Apply posters page v2
+      - name: Apply posters inside app
         run: |
-          unzip -o AlkafelLiveTV_PostersPagePatch_v2.zip -d posters_page_patch
+          unzip -o AlkafelLiveTV_Posters_InsideApp_Patch.zip -d posters_page_patch
           cp posters_page_patch/app/src/main/java/tv/alkafel/live/MainActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
           cp posters_page_patch/app/src/main/java/tv/alkafel/live/PosterActivity.java \
@@ -73,5 +74,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alkafel-Live-TV-Posters-v2-APK
+          name: Alkafel-Live-TV-Posters-Inside-App-APK
           path: project/AlkafelLiveTV/app/build/outputs/apk/debug/app-debug.apk
