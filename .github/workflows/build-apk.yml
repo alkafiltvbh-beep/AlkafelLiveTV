@@ -72,6 +72,14 @@ jobs:
           cp posters123/app/src/main/java/tv/alkafel/live/PosterActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
 
+      - name: Change Prayer Location to Karbala
+        run: |
+          find project/AlkafelLiveTV -type f \( -name "*.java" -o -name "*.xml" -o -name "*.json" \) -print0 | \
+          xargs -0 sed -i \
+          -e 's/البحرين - المنامة/العراق - كربلاء/g' \
+          -e 's/city=Manama\&country=Bahrain/city=Karbala\&country=Iraq/g' \
+          -e 's/city=Manama&country=Bahrain/city=Karbala&country=Iraq/g'
+
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
