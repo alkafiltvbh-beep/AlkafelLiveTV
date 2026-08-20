@@ -15,6 +15,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ==============================
+      # ANDROID PROJECT
+      # ==============================
+
       - name: Unzip Android project
         run: |
           unzip -o AlkafelLiveTV_WhatsApp_Direct.zip -d project
@@ -73,6 +77,10 @@ jobs:
           cp posters123/app/src/main/java/tv/alkafel/live/PosterActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/PosterActivity.java
 
+      # ==============================
+      # PRAYER LOCATION
+      # ==============================
+
       - name: Change Prayer Location to Karbala
         run: |
           find project/AlkafelLiveTV -type f \
@@ -81,6 +89,10 @@ jobs:
           xargs -0 sed -i \
             -e 's/البحرين - المنامة/العراق - كربلاء/g' \
             -e 's/city=Manama\&country=Bahrain/city=Karbala\&country=Iraq/g'
+
+      # ==============================
+      # R8
+      # ==============================
 
       - name: Add R8 protection
         run: |
@@ -96,6 +108,10 @@ jobs:
           -keep class tv.alkafel.live.** extends android.app.Activity { *; }
           EOF
 
+      # ==============================
+      # JAVA / GRADLE
+      # ==============================
+
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
@@ -108,15 +124,37 @@ jobs:
           gradle-version: "8.9"
 
       # ==============================
-      # SIGNING KEY
+      # SIGNING KEYSTORE
       # ==============================
 
       - name: Restore signing keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
+          test -n "$KEYSTORE_BASE64"
           echo "$KEYSTORE_BASE64" | base64 --decode > project/AlkafelLiveTV/alkafel-release-key.jks
           test -s project/AlkafelLiveTV/alkafel-release-key.jks
+          echo "Keystore restored successfully."
+
+      - name: Verify keystore password and alias
+        working-directory: project/AlkafelLiveTV
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          test -n "$STORE_PASSWORD"
+          test -n "$KEY_ALIAS"
+
+          keytool -list \
+            -keystore alkafel-release-key.jks \
+            -storepass "$STORE_PASSWORD" \
+            -alias "$KEY_ALIAS"
+
+          echo "Keystore password and alias are valid."
+
+      # ==============================
+      # CONFIGURE SIGNING
+      # ==============================
 
       - name: Configure Android signing
         working-directory: project/AlkafelLiveTV
@@ -127,16 +165,16 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
           groovy = Path("app/build.gradle")
           kotlin = Path("app/build.gradle.kts")
 
           if groovy.exists():
 
-              p = groovy
-              text = p.read_text()
+              text = groovy.read_text()
 
-              signing = '''
+              signing_block = '''
               signingConfigs {
                   release {
                       storeFile file("../alkafel-release-key.jks")
@@ -147,28 +185,45 @@ jobs:
               }
               '''
 
-              if "signingConfigs {" not in text:
-                  text = text.replace(
-                      "buildTypes {",
-                      signing + "\n    buildTypes {",
-                      1
-                  )
+              if "storeFile file(\"../alkafel-release-key.jks\")" not in text:
+                  match = re.search(r'android\s*\{', text)
+
+                  if not match:
+                      raise SystemExit("android block not found")
+
+                  pos = match.end()
+                  text = text[:pos] + "\n" + signing_block + text[pos:]
 
               if "signingConfig signingConfigs.release" not in text:
-                  text = text.replace(
-                      "release {",
-                      "release {\n            signingConfig signingConfigs.release",
-                      1
+
+                  pattern = r'(buildTypes\s*\{[\s\S]*?release\s*\{)'
+
+                  replacement = (
+                      r'\1'
+                      '\n            signingConfig signingConfigs.release'
                   )
 
-              p.write_text(text)
+                  text, count = re.subn(
+                      pattern,
+                      replacement,
+                      text,
+                      count=1
+                  )
+
+                  if count == 0:
+                      raise SystemExit(
+                          "release buildType not found"
+                      )
+
+              groovy.write_text(text)
+
+              print("Groovy signing configuration completed.")
 
           elif kotlin.exists():
 
-              p = kotlin
-              text = p.read_text()
+              text = kotlin.read_text()
 
-              signing = '''
+              signing_block = '''
               signingConfigs {
                   create("release") {
                       storeFile = file("../alkafel-release-key.jks")
@@ -179,48 +234,74 @@ jobs:
               }
               '''
 
-              if "signingConfigs {" not in text:
-                  text = text.replace(
-                      "buildTypes {",
-                      signing + "\n    buildTypes {",
-                      1
-                  )
+              if "alkafel-release-key.jks" not in text:
+
+                  match = re.search(r'android\s*\{', text)
+
+                  if not match:
+                      raise SystemExit("android block not found")
+
+                  pos = match.end()
+                  text = text[:pos] + "\n" + signing_block + text[pos:]
 
               if 'signingConfig = signingConfigs.getByName("release")' not in text:
-                  text = text.replace(
-                      'release {',
-                      'release {\n            signingConfig = signingConfigs.getByName("release")',
-                      1
+
+                  pattern = r'(buildTypes\s*\{[\s\S]*?release\s*\{)'
+
+                  replacement = (
+                      r'\1'
+                      '\n            signingConfig = signingConfigs.getByName("release")'
                   )
 
-              p.write_text(text)
+                  text, count = re.subn(
+                      pattern,
+                      replacement,
+                      text,
+                      count=1
+                  )
+
+                  if count == 0:
+                      raise SystemExit(
+                          "release buildType not found"
+                      )
+
+              kotlin.write_text(text)
+
+              print("Kotlin signing configuration completed.")
 
           else:
               raise SystemExit(
                   "ERROR: app/build.gradle or app/build.gradle.kts not found"
               )
-
-          print("Signing configuration completed successfully.")
           PY
 
-      - name: Verify signing
+      # ==============================
+      # VERIFY
+      # ==============================
+
+      - name: Verify signing configuration
         working-directory: project/AlkafelLiveTV
         run: |
           test -f alkafel-release-key.jks
-          echo "Keystore found."
+
+          echo "Checking Gradle files..."
 
           if [ -f app/build.gradle ]; then
-            grep -n "signingConfigs" app/build.gradle
-            grep -n "signingConfig signingConfigs.release" app/build.gradle
+            echo "Found app/build.gradle"
+            grep -n "alkafel-release-key.jks" app/build.gradle || true
+            grep -n "signingConfig" app/build.gradle || true
           fi
 
           if [ -f app/build.gradle.kts ]; then
-            grep -n "signingConfigs" app/build.gradle.kts
-            grep -n "signingConfig = signingConfigs.getByName" app/build.gradle.kts
+            echo "Found app/build.gradle.kts"
+            grep -n "alkafel-release-key.jks" app/build.gradle.kts || true
+            grep -n "signingConfig" app/build.gradle.kts || true
           fi
 
+          echo "Signing verification completed."
+
       # ==============================
-      # BUILD RELEASE APK
+      # BUILD
       # ==============================
 
       - name: Build Signed Release APK
@@ -230,13 +311,24 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          gradle assembleRelease
+          gradle assembleRelease --stacktrace
+
+      # ==============================
+      # FIND APK
+      # ==============================
 
       - name: Find generated APK
         run: |
-          echo "Searching for APK..."
+          echo "Searching for generated APK..."
+
           find project/AlkafelLiveTV/app/build/outputs/apk/release \
-            -type f -name "*.apk" -print
+            -type f \
+            -name "*.apk" \
+            -print
+
+      # ==============================
+      # UPLOAD APK
+      # ==============================
 
       - name: Upload Signed APK
         uses: actions/upload-artifact@v4
