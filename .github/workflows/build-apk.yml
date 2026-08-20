@@ -100,28 +100,20 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
-          p = Path(
-              "project/AlkafelLiveTV/app/build.gradle"
-          )
+          p = Path("project/AlkafelLiveTV/app/build.gradle")
 
           if not p.exists():
-              p = Path(
-                  "project/AlkafelLiveTV/app/build.gradle.kts"
-              )
+              p = Path("project/AlkafelLiveTV/app/build.gradle.kts")
 
           text = p.read_text()
 
-          if "minifyEnabled true" in text:
-              text = text.replace(
-                  "minifyEnabled true",
-                  "minifyEnabled true"
-              )
-          elif "minifyEnabled = true" not in text:
-              text = text.replace(
-                  "release {",
-                  "release {\n            minifyEnabled = true\n            shrinkResources = true",
-                  1
-              )
+          if "minifyEnabled = true" not in text and "isMinifyEnabled = true" not in text:
+              if "release {" in text:
+                  text = text.replace(
+                      "release {",
+                      "release {\n            minifyEnabled = true\n            shrinkResources = true",
+                      1
+                  )
 
           p.write_text(text)
           PY
@@ -141,8 +133,15 @@ jobs:
         working-directory: project/AlkafelLiveTV
         run: gradle assembleRelease
 
+      - name: Find generated APK
+        run: |
+          echo "Searching for generated APK..."
+          find project/AlkafelLiveTV/app/build/outputs/apk/release \
+            -type f -name "*.apk" -print
+
       - name: Upload Protected APK
         uses: actions/upload-artifact@v4
         with:
           name: Alkafel-Live-TV-Protected-Release
-          path: project/AlkafelLiveTV/app/build/outputs/apk/release/app-release.apk
+          path: project/AlkafelLiveTV/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
