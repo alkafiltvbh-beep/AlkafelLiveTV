@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Protected Release APK
 
 on:
   workflow_dispatch:
@@ -60,7 +60,7 @@ jobs:
 
       - name: Apply WhatsApp MainActivity
         run: |
-          unzip -o AlkafelLiveTV_MainActivity_WhatsApp_HiddenUntilPress.zip -d whatsapp_main
+          unzip -o AlkafelLiveTV_MainActivity_WhatsApp_Toggle.zip -d whatsapp_main
 
           cp whatsapp_main/app/src/main/java/tv/alkafel/live/MainActivity.java \
             project/AlkafelLiveTV/app/src/main/java/tv/alkafel/live/MainActivity.java
@@ -74,11 +74,57 @@ jobs:
 
       - name: Change Prayer Location to Karbala
         run: |
-          find project/AlkafelLiveTV -type f \( -name "*.java" -o -name "*.xml" -o -name "*.json" \) -print0 | \
+          find project/AlkafelLiveTV -type f \
+            \( -name "*.java" -o -name "*.xml" -o -name "*.json" \) \
+            -print0 | \
           xargs -0 sed -i \
-          -e 's/البحرين - المنامة/العراق - كربلاء/g' \
-          -e 's/city=Manama\&country=Bahrain/city=Karbala\&country=Iraq/g' \
-          -e 's/city=Manama&country=Bahrain/city=Karbala&country=Iraq/g'
+            -e 's/البحرين - المنامة/العراق - كربلاء/g' \
+            -e 's/city=Manama\&country=Bahrain/city=Karbala\&country=Iraq/g'
+
+      - name: Add R8 protection
+        run: |
+          cat > project/AlkafelLiveTV/app/proguard-rules.pro <<'EOF'
+          -keep public class tv.alkafel.live.MainActivity { *; }
+          -keep public class tv.alkafel.live.ZiyaratActivity { *; }
+          -keep public class tv.alkafel.live.PosterActivity { *; }
+          -keep public class tv.alkafel.live.ProgramsActivity { *; }
+
+          -keep class androidx.media3.** { *; }
+          -dontwarn androidx.media3.**
+
+          -keep class tv.alkafel.live.** extends android.app.Activity { *; }
+          EOF
+
+      - name: Enable R8
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path(
+              "project/AlkafelLiveTV/app/build.gradle"
+          )
+
+          if not p.exists():
+              p = Path(
+                  "project/AlkafelLiveTV/app/build.gradle.kts"
+              )
+
+          text = p.read_text()
+
+          if "minifyEnabled true" in text:
+              text = text.replace(
+                  "minifyEnabled true",
+                  "minifyEnabled true"
+              )
+          elif "minifyEnabled = true" not in text:
+              text = text.replace(
+                  "release {",
+                  "release {\n            minifyEnabled = true\n            shrinkResources = true",
+                  1
+              )
+
+          p.write_text(text)
+          PY
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -91,12 +137,12 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Build APK
+      - name: Build Release APK
         working-directory: project/AlkafelLiveTV
-        run: gradle assembleDebug
+        run: gradle assembleRelease
 
-      - name: Upload APK
+      - name: Upload Protected APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alkafel-Live-TV-Final-APK
-          path: project/AlkafelLiveTV/app/build/outputs/apk/debug/app-debug.apk
+          name: Alkafel-Live-TV-Protected-Release
+          path: project/AlkafelLiveTV/app/build/outputs/apk/release/app-release.apk
