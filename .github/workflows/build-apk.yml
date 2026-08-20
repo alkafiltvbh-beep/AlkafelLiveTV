@@ -1,4 +1,4 @@
-name: Build Protected Release APK
+name: Build Signed Release APK
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Unzip base Android project
+      - name: Unzip Android project
         run: |
           unzip -o AlkafelLiveTV_WhatsApp_Direct.zip -d project
           test -d project/AlkafelLiveTV
@@ -76,7 +76,7 @@ jobs:
         run: |
           find project/AlkafelLiveTV -type f \
             \( -name "*.java" -o -name "*.xml" -o -name "*.json" \) \
-            -print0 | \
+            -print0 |
           xargs -0 sed -i \
             -e 's/البحرين - المنامة/العراق - كربلاء/g' \
             -e 's/city=Manama\&country=Bahrain/city=Karbala\&country=Iraq/g'
@@ -129,19 +129,79 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Build Release APK
-        working-directory: project/AlkafelLiveTV
-        run: gradle assembleRelease
+      # ==============================
+      # SIGNING
+      # ==============================
 
-      - name: Find generated APK
+      - name: Restore signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          echo "Searching for generated APK..."
+          echo "$KEYSTORE_BASE64" | base64 --decode > project/AlkafelLiveTV/alkafel-release-key.jks
+          test -s project/AlkafelLiveTV/alkafel-release-key.jks
+
+      - name: Configure Android signing
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("project/AlkafelLiveTV/app/build.gradle")
+
+          if not p.exists():
+              raise SystemExit("build.gradle not found")
+
+          text = p.read_text()
+
+          signing_block = '''
+              signingConfigs {
+                  release {
+                      storeFile file("../alkafel-release-key.jks")
+                      storePassword System.getenv("STORE_PASSWORD")
+                      keyAlias System.getenv("KEY_ALIAS")
+                      keyPassword System.getenv("KEY_PASSWORD")
+                  }
+              }
+          '''
+
+          if "signingConfigs {" not in text:
+              text = text.replace(
+                  "android {",
+                  "android {" + signing_block,
+                  1
+              )
+
+          if "signingConfig signingConfigs.release" not in text:
+              text = text.replace(
+                  "release {",
+                  "release {\n            signingConfig signingConfigs.release",
+                  1
+              )
+
+          p.write_text(text)
+          PY
+
+      - name: Build Signed Release APK
+        working-directory: project/AlkafelLiveTV
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          gradle assembleRelease
+
+      - name: Find generated signed APK
+        run: |
+          echo "Searching for signed APK..."
           find project/AlkafelLiveTV/app/build/outputs/apk/release \
             -type f -name "*.apk" -print
 
-      - name: Upload Protected APK
+      - name: Upload Signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alkafel-Live-TV-Protected-Release
+          name: Alkafel-Live-TV-Signed-Release
           path: project/AlkafelLiveTV/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
